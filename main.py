@@ -15,8 +15,8 @@ from db_conexao import Conexao
 _db_name, db_host, _db_user, _db_pwd = '','','',''
 _txt_config = 'config.txt'
 
-#Conig padrao de acesso ao banco de dados
-txt_param = 'path=localhost\n banco=autosystem\n user=postgres\n password=postgres'
+#Conig padrao de acesso ao banco de dados, após a criacao do arquivo editar o mesmo com os dados de acesso do db.
+txt_param = 'path=host\n banco=db_name\n user=user\n password=pwd'
 
 #Verificação se existe a configuração  de acesso ao banco de dados e se não exisitr ele cria a configuração padrao
 if not os.path.exists(_txt_config):
