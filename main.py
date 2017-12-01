@@ -12,35 +12,37 @@ from datetime import datetime
 from db_conexao import Conexao
 
 
-_db_name, db_host, _db_user, _db_pwd = '','','',''
-_txt_config = 'config.txt'
+db_name, db_host, db_user, db_pwd = '','','',''
+txt_config = 'config.txt'
 
 #Conig padrao de acesso ao banco de dados, após a criacao do arquivo editar o mesmo com os dados de acesso do db.
 txt_param = 'path=host\n banco=db_name\n user=user\n password=pwd'
 
-#Verificação se existe a configuração  de acesso ao banco de dados e se não exisitr ele cria a configuração padrao
-if not os.path.exists(_txt_config):
-    txt_config = open(_txt_config, 'w')
+#Verificação se existe a configuração  de acesso ao banco de dados e se não exisitr ele cria a configuração padrao.
+if not os.path.exists(txt_config):
+    txt_config = open(txt_config, 'w')
     txt_config.write('%s' % (txt_param.replace(' ','')))
     txt_config.close()
 
 if os.path.exists(_txt_config):
-    _db_config = open('config.txt','r')
-    _conteudo  = _db_config.readlines()
+    db_config = open('config.txt','r')
+    conteudo  = db_config.readlines()
 
-    for row in _conteudo:
+    for row in conteudo:
         config = row.split('=')
         if config[0] == 'path':
-            _db_host = config[1].rstrip('\n')
+            db_host = config[1].rstrip('\n')
         if config[0] == 'banco':
-            _db_name = config[1].rstrip('\n')
+            db_name = config[1].rstrip('\n')
         if config[0] == 'user':
-            _db_user = config[1].rstrip('\n')
+            db_user = config[1].rstrip('\n')
         if config[0] == 'password':
-            _db_pwd = config[1].rstrip('\n')
+            db_pwd = config[1].rstrip('\n')
 
-    _db_config.close()
-    conn = Conexao(_db_host,_db_name,_db_user,_db_pwd)
+    db_config.close()
+    
+    #Abre a conexão com o db.
+    conn = Conexao(db_host,db_name,db_user,db_pwd)
 
 #Gera o log dos sql executados no banco de dados.
 def logg(str):
@@ -53,9 +55,9 @@ def logg(str):
     if not os.path.exists(arquivo):
         open(arquivo, 'w')
     else:
-        srt_log = open(arquivo,'a')
-        srt_log.writelines("\n%s = %s " %(now, str.replace('  ',' ')))
-        srt_log.close()
+        arq_log = open(arquivo,'a')
+        arq_log.writelines("\n%s = %s " %(now, str.replace('  ',' ')))
+        arq_log.close()
 
 #Percorre os items da NF-e a procura de valores divergentes
 def verifica_valor_divergente(codigo, modelo_doc, nr_nota):
@@ -66,11 +68,9 @@ def verifica_valor_divergente(codigo, modelo_doc, nr_nota):
         empresa = rs[0]
         if empresa is not None:
                 sql = """ SELECT nfp.grid, nfp.quantidade as qtd, nfp.preco_unit, nfp.valor_desconto as desconto, nfp.valor_acrescimo as acrescimo, ROUND(CAST(nfp.quantidade * nfp.preco_unit AS NUMERIC),2) AS valor_sefaz, nfp.valor AS valor_autosystem, nfp.subtotal, CASE WHEN  ROUND(CAST(( nfp.valor - (nfp.quantidade * nfp.preco_unit)) AS NUMERIC),2) >= 0.02 OR  ROUND(CAST(( nfp.valor - (nfp.quantidade * nfp.preco_unit)) AS NUMERIC),2) <= -0.02 THEN 'SIM' ELSE 'NAO' END AS diff, ROUND(CAST(( nfp.valor - (nfp.quantidade * nfp.preco_unit)) AS NUMERIC),2) as valor_diff FROM nota_fiscal_produto nfp JOIN nota_fiscal nf ON(nfp.nota_fiscal=nf.grid) WHERE nf.empresa='%s' and nf.modelo='%s' and nf.numero_nota='%s'""" %(empresa, modelo_doc, nr_nota)
-
                 result = conn.consultar(sql)
                 logg(sql)
                 return  result
-
         else:
             return False
 
