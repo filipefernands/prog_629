@@ -117,7 +117,7 @@ def main():
                 if len(list) > 0:
                     os.system("cls")
                     print (" +========================== DIVERGENCIAS ENCONTRADAS ===============================+ ")
-                    print (" | Grid      | Quantidade   | Preco Unit  | Valor Sefaz   | Valor ATS   | Diferencao |")
+                    print (" | Grid      | Quantidade   | Preco Unit  | Valor Sefaz   | Valor ATS   | Diferenca  |")
                     print (" +-----------+--------------+-------------+---------------+-------------+------------+")
 
                     for row in list:
